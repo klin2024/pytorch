@@ -172,6 +172,32 @@ if sys.platform == "win32":
         )
         py_root_bin_path = os.path.join(sys.exec_prefix, "bin")
 
+        # Setup rocm
+        rocm_components_dll_path = os.path.join(os.path.dirname(__file__), "lib", "rocm")
+        sys.path.insert(0, rocm_components_dll_path)
+
+        if "MIOPEN_SYSTEM_DB_PATH" not in os.environ:
+            os.environ["MIOPEN_SYSTEM_DB_PATH"] = str(rocm_components_dll_path)
+
+        miopen_dir = os.path.join(rocm_components_dll_path, ".miopen")
+        if "MIOPEN_USER_DB_PATH" not in os.environ:
+            os.environ["MIOPEN_USER_DB_PATH"] = str(os.path.join(miopen_dir, "db"))
+        
+        if "MIOPEN_CUSTOM_CACHE_DIR" not in os.environ:
+            os.environ["MIOPEN_CUSTOM_CACHE_DIR"] = str(os.path.join(miopen_dir, "cache"))
+        
+        # Default enable AOTriton
+        if "TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL" not in os.environ:
+            os.environ["TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL"] = "1"
+        
+        # Default disable naive in MIOpen
+        if "MIOPEN_DEBUG_CONV_DIRECT" not in os.environ:
+            os.environ["MIOPEN_DEBUG_CONV_DIRECT"] = "0"
+
+        # Default enable attention ops in MIGraphX
+        if "MIGRAPHX_MLIR_USE_SPECIFIC_OPS" not in os.environ:
+            os.environ["MIGRAPHX_MLIR_USE_SPECIFIC_OPS"] = "attention"
+
         # When users create a virtualenv that inherits the base environment,
         # we will need to add the corresponding library directory into
         # DLL search directories. Otherwise, it will rely on `PATH` which
@@ -189,6 +215,7 @@ if sys.platform == "win32":
                 base_py_dll_path,
                 usebase_path,
                 py_root_bin_path,
+                rocm_components_dll_path
             )
             if os.path.exists(p)
         ]

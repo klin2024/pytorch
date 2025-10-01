@@ -198,6 +198,10 @@ if sys.platform == "win32":
         if "MIGRAPHX_MLIR_USE_SPECIFIC_OPS" not in os.environ:
             os.environ["MIGRAPHX_MLIR_USE_SPECIFIC_OPS"] = "attention"
 
+        # Default disable MIOpen log
+        if "MIOPEN_LOG_LEVEL" not in os.environ:
+            os.environ["MIOPEN_LOG_LEVEL"] = "1"
+
         # When users create a virtualenv that inherits the base environment,
         # we will need to add the corresponding library directory into
         # DLL search directories. Otherwise, it will rely on `PATH` which

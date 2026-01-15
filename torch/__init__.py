@@ -22,6 +22,8 @@ import platform
 import sys
 import textwrap
 import threading
+import pathlib
+import shutil
 import warnings
 from collections.abc import Callable as _Callable
 from typing import (
@@ -175,6 +177,51 @@ if sys.platform == "win32":
             sysconfig.get_config_var("userbase"), "Library", "bin"
         )
         py_root_bin_path = os.path.join(sys.exec_prefix, "bin")
+        
+        # Setup rocm
+        rocm_components_dll_path = os.path.join(os.path.dirname(__file__), "lib", "rocm")
+        sys.path.insert(0, rocm_components_dll_path)
+
+        # Setup miopen db
+        appdata_path = os.getenv('APPDATA')
+        miope_db_path = pathlib.Path(appdata_path) / "ROCm" / ".miopen"
+
+        if not miope_db_path.exists():
+            try:
+                miope_db_path.mkdir(parents=True, exist_ok=True)
+
+                package_dir = pathlib.Path(__file__).parent
+                miope_default_db_path = package_dir / "lib" / "rocm" / ".miopen"
+                if miope_db_path.exists():
+                    shutil.copytree(miope_default_db_path, miope_db_path, dirs_exist_ok=True)
+            except Exception:
+                print("Unexpected error when creating the .miopen db.")
+                pass
+
+        if "MIOPEN_SYSTEM_DB_PATH" not in os.environ:
+            os.environ["MIOPEN_SYSTEM_DB_PATH"] = str(rocm_components_dll_path)
+
+        if "MIOPEN_USER_DB_PATH" not in os.environ:
+            os.environ["MIOPEN_USER_DB_PATH"] = str(os.path.join(miope_db_path, "db"))
+
+        if "MIOPEN_CUSTOM_CACHE_DIR" not in os.environ:
+            os.environ["MIOPEN_CUSTOM_CACHE_DIR"] = str(os.path.join(miope_db_path, "cache"))
+
+        # Default enable AOTriton
+        if "TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL" not in os.environ:
+            os.environ["TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL"] = "1"
+
+        # Default disable naive in MIOpen
+        if "MIOPEN_DEBUG_CONV_DIRECT" not in os.environ:
+            os.environ["MIOPEN_DEBUG_CONV_DIRECT"] = "0"
+
+        # Default enable attention ops in MIGraphX
+        if "MIGRAPHX_MLIR_USE_SPECIFIC_OPS" not in os.environ:
+            os.environ["MIGRAPHX_MLIR_USE_SPECIFIC_OPS"] = "attention"
+
+        # Default disable MIOpen log
+        if "MIOPEN_LOG_LEVEL" not in os.environ:
+            os.environ["MIOPEN_LOG_LEVEL"] = "1"
 
         # When users create a virtualenv that inherits the base environment,
         # we will need to add the corresponding library directory into
@@ -193,6 +240,7 @@ if sys.platform == "win32":
                 base_py_dll_path,
                 usebase_path,
                 py_root_bin_path,
+                rocm_components_dll_path
             )
             if os.path.exists(p)
         ]

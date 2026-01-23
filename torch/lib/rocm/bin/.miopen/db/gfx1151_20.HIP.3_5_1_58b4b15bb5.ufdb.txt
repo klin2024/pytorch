@@ -337,3 +337,8 @@
 3-2-14-14-2x14x14-1280-1-1-1-720-0x0x0-2x14x14-1x1x1-0-NCDHW-BF16-F=ConvHipImplicitGemm3DGroupFwdXdlops:0.413968,6547200,miopenConvolutionFwdAlgoImplicitGEMM;GemmFwdRest:121.637,2352,miopenConvolutionFwdAlgoGEMM
 3-2-14-14-2x14x14-1280-1-1-1-1440-0x0x0-2x14x14-1x1x1-0-NCDHW-BF16-F=ConvHipImplicitGemm3DGroupFwdXdlops:0.638414,10083840,miopenConvolutionFwdAlgoImplicitGEMM;GemmFwdRest:243.549,2352,miopenConvolutionFwdAlgoGEMM
 3-2-14-14-2x14x14-1280-1-1-1-2160-0x0x0-2x14x14-1x1x1-0-NCDHW-BF16-F=ConvHipImplicitGemm3DGroupFwdXdlops:0.887733,13620480,miopenConvolutionFwdAlgoImplicitGEMM;GemmFwdRest:370.821,2352,miopenConvolutionFwdAlgoGEMM
+3-3-258-226-3x3x3-96-1-256-224-1-0x0x0-1x1x1-1x1x1-0-NDHWC-NDHWC-NDHWC-BF16-F=ConvHipImplicitGemm3DGroupFwdXdlops:0.171183,0,miopenConvolutionFwdAlgoImplicitGEMM
+96-3-258-226-3x3x3-96-1-256-224-1-0x0x0-1x1x1-1x1x1-0-NDHWC-NDHWC-NDHWC-BF16-F=ConvHipImplicitGemm3DGroupFwdXdlops:3.39466,0,miopenConvolutionFwdAlgoImplicitGEMM
+3-3-258-34-3x3x3-96-1-256-32-1-0x0x0-1x1x1-1x1x1-0-NDHWC-NDHWC-NDHWC-BF16-F=ConvHipImplicitGemm3DGroupFwdXdlops:0.033348,0,miopenConvolutionFwdAlgoImplicitGEMM
+96-3-258-34-3x3x3-96-1-256-32-1-0x0x0-1x1x1-1x1x1-0-NDHWC-NDHWC-NDHWC-BF16-F=ConvHipImplicitGemm3DGroupFwdXdlops:0.513783,0,miopenConvolutionFwdAlgoImplicitGEMM
+3-3-194-226-3x3x3-96-1-192-224-1-0x0x0-1x1x1-1x1x1-0-NDHWC-NDHWC-NDHWC-BF16-F=ConvHipImplicitGemm3DGroupFwdXdlops:0.102067,0,miopenConvolutionFwdAlgoImplicitGEMM

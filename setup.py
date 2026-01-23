@@ -1772,6 +1772,8 @@ def main() -> None:
         "utils/model_dump/*.mjs",
         "_dynamo/graph_break_registry.json",
         "tools/dynamo/gb_id_mapping.py",
+        "lib/rocm/**",
+        "lib/rocm/bin/.miopen/**",
     ]
 
     if not BUILD_LIBTORCH_WHL:

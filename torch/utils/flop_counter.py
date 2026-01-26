@@ -42,7 +42,7 @@ def register_flop_formula(targets, get_raw=False) -> Callable[[Callable[_P, _T]]
     try:
         from triton.runtime.jit import JITFunction
     except ImportError:
-        log.warning("triton not found; flop counting will not work for triton kernels")
+        # log.warning("triton not found; flop counting will not work for triton kernels")
         JITFunction = NoneType
 
     def register_fun(flop_formula: Callable[_P, _T]) -> Callable[_P, _T]:

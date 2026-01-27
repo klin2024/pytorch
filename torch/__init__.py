@@ -187,7 +187,7 @@ if sys.platform == "win32":
                 miope_db_path.mkdir(parents=True, exist_ok=True)
 
                 package_dir = pathlib.Path(__file__).parent
-                miope_default_db_path = package_dir / "lib" / "rocm" / ".miopen"
+                miope_default_db_path = package_dir / "lib" / "rocm" / "bin" / ".miopen"
                 if miope_db_path.exists():
                     shutil.copytree(miope_default_db_path, miope_db_path, dirs_exist_ok=True)
             except Exception:

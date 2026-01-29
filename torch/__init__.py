@@ -173,8 +173,9 @@ if sys.platform == "win32":
             sysconfig.get_config_var("userbase"), "Library", "bin"
         )
         py_root_bin_path = os.path.join(sys.exec_prefix, "bin")
-        
+
         # Setup rocm
+        rocm_sdk_path            = os.path.join(os.path.dirname(__file__), "lib", "rocm")
         rocm_components_dll_path = os.path.join(os.path.dirname(__file__), "lib", "rocm", "bin")
         sys.path.insert(0, rocm_components_dll_path)
 
@@ -218,6 +219,29 @@ if sys.platform == "win32":
         # Default disable MIOpen log
         if "MIOPEN_LOG_LEVEL" not in os.environ:
             os.environ["MIOPEN_LOG_LEVEL"] = "1"
+
+        # triton workaround
+        def _workaround_get_path():
+            return os.path.join(rocm_components_dll_path, "amdhip64_7.dll")
+
+        try:
+            import triton.backends.amd.driver as amd_driver
+
+            # hack _get_path_to_hip_runtime_dylib
+            if hasattr(amd_driver, "_get_path_to_hip_runtime_dylib"):
+                old_func = getattr(amd_driver, "_get_path_to_hip_runtime_dylib")
+                if hasattr(old_func, "cache_clear"):
+                    old_func.cache_clear()
+                amd_driver._get_path_to_hip_runtime_dylib = _workaround_get_path
+
+            # hack include_path
+            include_path = os.path.join(rocm_sdk_path, "include")
+            if include_path not in amd_driver.include_dirs:
+                amd_driver.include_dirs.append(include_path)
+        except (ImportError, AttributeError) as e:
+            # print(f"Failed to patch: {e}")
+            pass
+
 
         # When users create a virtualenv that inherits the base environment,
         # we will need to add the corresponding library directory into

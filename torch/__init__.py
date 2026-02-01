@@ -244,14 +244,14 @@ if sys.platform == "win32":
             pass
 
         # Setup triton cache db
-        triton_cache_path = pathlib.Path(appdata_path) / "ROCm" / (f".triton-{rocm_data_version}")
+        triton_cache_path = pathlib.Path(appdata_path) / "ROCm" / (f".triton-{rocm_data_version}") / "cache"
 
         if not triton_cache_path.exists():
             try:
                 triton_cache_path.mkdir(parents=True, exist_ok=True)
 
                 package_dir = pathlib.Path(__file__).parent
-                triton_default_cache_path = package_dir / "lib" / "rocm" / "bin" / ".triton"
+                triton_default_cache_path = package_dir / "lib" / "rocm" / "bin" / ".triton" / "cache"
                 if triton_cache_path.exists():
                     shutil.copytree(triton_default_cache_path, triton_cache_path, dirs_exist_ok=True)
             except Exception:

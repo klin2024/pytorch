@@ -177,11 +177,12 @@ if sys.platform == "win32":
         # Setup rocm
         rocm_sdk_path            = os.path.join(os.path.dirname(__file__), "lib", "rocm")
         rocm_components_dll_path = os.path.join(os.path.dirname(__file__), "lib", "rocm", "bin")
+        rocm_data_version        = "v1.0.0"
         sys.path.insert(0, rocm_components_dll_path)
 
         # Setup miopen db
         appdata_path = os.getenv('APPDATA')
-        miope_db_path = pathlib.Path(appdata_path) / "ROCm" / ".miopen"
+        miope_db_path = pathlib.Path(appdata_path) / "ROCm" / (f".miopen-{rocm_data_version}")
 
         if not miope_db_path.exists():
             try:
@@ -241,6 +242,24 @@ if sys.platform == "win32":
         except (ImportError, AttributeError) as e:
             # print(f"Failed to patch: {e}")
             pass
+
+        # Setup triton cache db
+        triton_cache_path = pathlib.Path(appdata_path) / "ROCm" / (f".triton-{rocm_data_version}")
+
+        if not triton_cache_path.exists():
+            try:
+                triton_cache_path.mkdir(parents=True, exist_ok=True)
+
+                package_dir = pathlib.Path(__file__).parent
+                triton_default_cache_path = package_dir / "lib" / "rocm" / "bin" / ".triton"
+                if triton_cache_path.exists():
+                    shutil.copytree(triton_default_cache_path, triton_cache_path, dirs_exist_ok=True)
+            except Exception:
+                print("Unexpected error when creating the .triton cache.")
+                pass
+
+        if "TRITON_CACHE_DIR" not in os.environ:
+            os.environ["TRITON_CACHE_DIR"] = str(triton_cache_path)
 
 
         # When users create a virtualenv that inherits the base environment,

@@ -1,0 +1,43 @@
+
+#ifndef MIOPEN_EXPORT_H
+#define MIOPEN_EXPORT_H
+
+#ifdef MIOPEN_STATIC_DEFINE
+#  define MIOPEN_EXPORT
+#  define MIOPEN_NO_EXPORT
+#else
+#  ifndef MIOPEN_EXPORT
+#    ifdef MIOpen_EXPORTS
+        /* We are building this library */
+#      define MIOPEN_EXPORT __declspec(dllexport)
+#    else
+        /* We are using this library */
+#      define MIOPEN_EXPORT __declspec(dllimport)
+#    endif
+#  endif
+
+#  ifndef MIOPEN_NO_EXPORT
+#    define MIOPEN_NO_EXPORT 
+#  endif
+#endif
+
+#ifndef MIOPEN_DEPRECATED
+#  define MIOPEN_DEPRECATED __declspec(deprecated)
+#endif
+
+#ifndef MIOPEN_DEPRECATED_EXPORT
+#  define MIOPEN_DEPRECATED_EXPORT MIOPEN_EXPORT MIOPEN_DEPRECATED
+#endif
+
+#ifndef MIOPEN_DEPRECATED_NO_EXPORT
+#  define MIOPEN_DEPRECATED_NO_EXPORT MIOPEN_NO_EXPORT MIOPEN_DEPRECATED
+#endif
+
+/* NOLINTNEXTLINE(readability-avoid-unconditional-preprocessor-if) */
+#if 0 /* DEFINE_NO_DEPRECATED */
+#  ifndef MIOPEN_NO_DEPRECATED
+#    define MIOPEN_NO_DEPRECATED
+#  endif
+#endif
+
+#endif /* MIOPEN_EXPORT_H */

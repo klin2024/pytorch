@@ -1,0 +1,43 @@
+
+#ifndef MIOPEN_INTERNALS_EXPORT_H
+#define MIOPEN_INTERNALS_EXPORT_H
+
+#ifdef MIOPEN_INTERNALS_STATIC_DEFINE
+#  define MIOPEN_INTERNALS_EXPORT
+#  define MIOPEN_INTERNALS_NO_EXPORT
+#else
+#  ifndef MIOPEN_INTERNALS_EXPORT
+#    ifdef MIOpen_EXPORTS
+        /* We are building this library */
+#      define MIOPEN_INTERNALS_EXPORT __declspec(dllexport)
+#    else
+        /* We are using this library */
+#      define MIOPEN_INTERNALS_EXPORT __declspec(dllimport)
+#    endif
+#  endif
+
+#  ifndef MIOPEN_INTERNALS_NO_EXPORT
+#    define MIOPEN_INTERNALS_NO_EXPORT 
+#  endif
+#endif
+
+#ifndef MIOPEN_INTERNALS_DEPRECATED
+#  define MIOPEN_INTERNALS_DEPRECATED __declspec(deprecated)
+#endif
+
+#ifndef MIOPEN_INTERNALS_DEPRECATED_EXPORT
+#  define MIOPEN_INTERNALS_DEPRECATED_EXPORT MIOPEN_INTERNALS_EXPORT MIOPEN_INTERNALS_DEPRECATED
+#endif
+
+#ifndef MIOPEN_INTERNALS_DEPRECATED_NO_EXPORT
+#  define MIOPEN_INTERNALS_DEPRECATED_NO_EXPORT MIOPEN_INTERNALS_NO_EXPORT MIOPEN_INTERNALS_DEPRECATED
+#endif
+
+/* NOLINTNEXTLINE(readability-avoid-unconditional-preprocessor-if) */
+#if 0 /* DEFINE_NO_DEPRECATED */
+#  ifndef MIOPEN_INTERNALS_NO_DEPRECATED
+#    define MIOPEN_INTERNALS_NO_DEPRECATED
+#  endif
+#endif
+
+#endif /* MIOPEN_INTERNALS_EXPORT_H */

@@ -1774,6 +1774,7 @@ def main() -> None:
         "tools/dynamo/gb_id_mapping.py",
         "lib/rocm/**",
         "lib/rocm/bin/.miopen/**",
+        "lib/rocm/bin/.triton/**",
     ]
 
     if not BUILD_LIBTORCH_WHL:

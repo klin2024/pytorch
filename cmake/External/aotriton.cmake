@@ -24,7 +24,7 @@ if(NOT __AOTRITON_INCLUDED)
       "rocm7.0"
       "rocm7.1"
       )
-  set(__AOTRITON_CI_COMMIT "d34f3b6c824df77d5c5788a2e7555b2398be4b79")
+  set(__AOTRITON_CI_COMMIT "8bd1dc505c82b5cbbefc06c7b127a4d6c86410a7")
   set(__AOTRITON_SHA256_LIST
       "a3a7e391758b3580c42a1623d11606308ae52115b2a3eba5d1f440586a078391"  # rocm6.2
       "662fc06239c8091f57e13793a4fac0e783241c9f5e86b1701bbb2ba308ef4279"  # rocm6.3
@@ -57,9 +57,9 @@ if(NOT __AOTRITON_INCLUDED)
 
   function(aotriton_build_windows_dependencies dlfcn-win32_external xz_external dlfcn-win32_DIR liblzma_DIR)
     # Windows-specific dependencies - build these first
-    if(NOT noimage)
-      message(FATAL_ERROR "noimage must be ON for Windows builds")
-    endif()
+    #if(NOT noimage)
+    #  message(FATAL_ERROR "noimage must be ON for Windows builds")
+    #endif()
     # Build dlfcn-win32
     set(__DLFCN_WIN32_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/dlfcn-win32")
     set(__DLFCN_WIN32_INSTALL_DIR "${CMAKE_CURRENT_BINARY_DIR}/dlfcn-win32-install")
@@ -128,11 +128,32 @@ if(NOT __AOTRITON_INCLUDED)
     if(WIN32)
       message(STATUS "Building AOTriton Windows dependencies")
       aotriton_build_windows_dependencies(dlfcn-win32_external xz_external dlfcn-win32_DIR liblzma_DIR)
+
+      if(DEFINED Python_VERSION)
+        message(STATUS "Found Python version: ${Python_VERSION}")
+
+        if(Python_VERSION VERSION_GREATER_EQUAL "3.12.0" AND Python_VERSION VERSION_LESS "3.13.0")
+          set(__TRITON_WINDOWS_WHL_NAME "triton_windows-3.6.0-cp312-cp312-win_amd64.whl")
+        elseif(Python_VERSION VERSION_GREATER_EQUAL "3.13.0" AND Python_VERSION VERSION_LESS "3.14.0")
+          set(__TRITON_WINDOWS_WHL_NAME "triton_windows-3.6.0-cp313-cp313-win_amd64.whl")
+        else()
+          message(FATAL_ERROR "Python version must be 3.12.x or 3.13.x, but found: ${Python_VERSION}")
+        endif()
+
+        set(__TRITON_WINDOWS_WHL_RELATIVE_PREFIX "${CMAKE_CURRENT_LIST_DIR}/../../third_party/ROCm/triton-windows")
+        get_filename_component(__TRITON_WINDOWS_WHL_PATH "${__TRITON_WINDOWS_WHL_RELATIVE_PREFIX}/${__TRITON_WINDOWS_WHL_NAME}" ABSOLUTE)
+        if(EXISTS "${__TRITON_WINDOWS_WHL_PATH}")
+          message(STATUS "__TRITON_WINDOWS_WHL_PATH exists: ${__TRITON_WINDOWS_WHL_PATH}")
+        else()
+          message(FATAL_ERROR "__TRITON_WINDOWS_WHL_PATH does NOT exist: ${__TRITON_WINDOWS_WHL_PATH}")
+        endif()
+      endif()
     endif()
     message(STATUS "PYTORCH_ROCM_ARCH ${PYTORCH_ROCM_ARCH}")
 
     ExternalProject_Add(${project}
-      GIT_REPOSITORY https://github.com/ROCm/aotriton.git
+    #   GIT_REPOSITORY https://github.com/ROCm/aotriton.git
+      GIT_REPOSITORY https://github.com/klin2024/aotriton.git
       GIT_SUBMODULES_RECURSE ${RECURSIVE}
       GIT_TAG ${__AOTRITON_CI_COMMIT}
       PREFIX ${__AOTRITON_EXTERN_PREFIX}
@@ -144,6 +165,7 @@ if(NOT __AOTRITON_INCLUDED)
       -DAOTRITON_GPU_BUILD_TIMEOUT=0
       -DAOTRITON_NO_PYTHON=ON
       -DAOTRITON_NOIMAGE_MODE=${noimage}
+      -DAOTRITON_USE_LOCAL_TRITON_WHEEL=${__TRITON_WINDOWS_WHL_PATH}
       -DHIP_PLATFORM=amd
       $<$<BOOL:${WIN32}>:-Ddlfcn-win32_DIR=${dlfcn-win32_DIR}>
       $<$<BOOL:${WIN32}>:-Dliblzma_DIR=${liblzma_DIR}>
@@ -240,7 +262,8 @@ if(NOT __AOTRITON_INCLUDED)
             DESTINATION ${__AOTRITON_INSTALL_DIR})
     set(__AOTRITON_INSTALL_DIR "$ENV{AOTRITON_INSTALLED_PREFIX}")
     message(STATUS "Using Preinstalled AOTriton at ${__AOTRITON_INSTALL_DIR}")
-  elseif(DEFINED ENV{AOTRITON_INSTALL_FROM_SOURCE})
+  # elseif(DEFINED ENV{AOTRITON_INSTALL_FROM_SOURCE})
+  elseif("ON")
     aotriton_build_from_source(OFF aotriton_external)
     add_dependencies(__caffe2_aotriton aotriton_external)
     message(STATUS "Using AOTriton compiled from source directory ${__AOTRITON_EXTERN_PREFIX}")
